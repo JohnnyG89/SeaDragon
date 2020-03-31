@@ -1,6 +1,21 @@
-#define TimeZone -4
-#define MQTT_CHANNEL_COUNT 20
-
+//Global Function Declarations
+void blink1CB();
+void ioReadIn();
+void ioWriteOut();
+void ATOcb();
+void Alarmscb();
+void NTPcb();
+void MQTTcb();
+void RandomMQTTValueGenerator();
+void CommCheckcb();
+void logTaskTimer(Scheduler* pscheduler, String TaskName);
+void logScheduler(Scheduler* pscheduler);
+void PrintTime();
+void LogEntry(String s);
+void initEthernetHardware();
+void initP1AMHardware();
+void initStorageHardware();
+void initRTC();
 //log(String("" + String()).c_str());
 
 //IO Declarations
@@ -20,18 +35,20 @@ RTCZero rtc;
 
 bool gTimeSet = false;
 byte mac[] = {0x60, 0x52, 0xD0, 0x06, 0x68, 0x2E};  // P1AM-ETH have unique MAC IDs on their product label
-//const char broker[]    = "broker.shiftr.io";  // MQTT Broker URL
+const char broker[]    = "broker.shiftr.io";  // MQTT Broker URL
 //const char broker[]    = "bk0vn6.messaging.internetofthings.ibmcloud.com/";  // MQTT Broker URL
-//const char broker[] = "127.0.0.1";
-const char broker[] = "broker.emqx.io";
+//const char broker[] = "broker.emqx.io";
+//const char broker[] = "192.168.10.63";
 int port = 1883;
 unsigned int NTPPort = 8888;
 const char TimeServer[] = "time.nist.gov";
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 uint8_t lastSentReading = 0; //Stores last Input Reading sent to the broker
-const char UserName[] = "admin";
-const char Password[] = "admin";
+const char UserName[] = "2cc80738";
+const char Password[] = "4a2823143f869c33";
+//const char UserName[] = "admin";
+//const char Password[] = "admin";
 //const char ChannelName[] = "testtopic/Topic2/Hello";
 const char ChannelName[MQTT_CHANNEL_COUNT][50]= {
 {"testtopic/Topic2/Ch0"}, 
@@ -69,4 +86,4 @@ const int chipSelect = SDCARD_SS_PIN;
 File dataFile;
 
 //Other global parameters:
-time_t t;
+//time_t t;
