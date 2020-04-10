@@ -5,21 +5,20 @@
 //  ....''             |___________ .'           `. |......'  |      `.   .'           `.  `-._____.'|  `.______.'  |          ``|
 //
 //                                                          Reef On
-
-#include <plclib.h>
+#include "Global_Includes.h"
 
 TON tmrMaxATOOnTime(10000);
 
 void initATO(void) {
-  log("Initializing ATO...");
+  prglog("Initializing ATO...");
   
   tskATO.setCallback(&cyclicATO);
   
-  log("Initialized ATO");
+  prglog("Initialized ATO");
 }
 
 void cyclicATO(void) {
-  logTaskTimer(&ts, "ATO");
+  logTaskTimer(&ts_high, "ATO", "High");
    tmrMaxATOOnTime.process(outATOPump);
 
   //If all 3 sensors are out of water, turn on the ATO

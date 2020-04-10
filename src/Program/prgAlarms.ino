@@ -7,14 +7,14 @@
 //                                                          Reef On
 
 void initAlarms(void){
-  log("Initializing Alarms...");
+  prglog("Initializing Alarms...");
   
   tskAlarms.setCallback(&cyclicAlarms);
   
-  log("Initialized Alarms");
+  prglog("Initialized Alarms");
 }
 
 void cyclicAlarms(void){
-  logTaskTimer(&ts, "Alarms");
+  logTaskTimer(&ts_high, "Alarms", "High");
   
 }

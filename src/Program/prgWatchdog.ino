@@ -5,27 +5,28 @@
 //  ....''             |___________ .'           `. |......'  |      `.   .'           `.  `-._____.'|  `.______.'  |          ``|
 //
 //                                                          Reef On
+#include "Global_Includes.h"
 
 void initWatchdog(void) {
-  log("Initializing Watchdog...");
+  prglog("Initializing Watchdog...");
 
   if (_ENABLE_WATCHDOG) {
-    log("Enabling Watchdog Timer");
-    P1.configWD(_WATCHDOG_TIMEOUT, TOGGLE);
+    prglog("Enabling Watchdog Timer");
+    P1.configWD(WATCHDOG_TIMEOUT, TOGGLE);
     P1.startWD();
   } else {
-    log("Not Enabling Watchdog Timer");
+    prglog("Not Enabling Watchdog Timer");
   }
 
   tskWatchdog.setCallback(&cyclicWatchdog);
-  log("Initialized Watchdog.");
+  prglog("Initialized Watchdog.");
 }
 
 void cyclicWatchdog(void) {
-  logTaskTimer(&ts, "Watchdog");
+  logTaskTimer(&ts_high, "Watchdog", "High");
 
   if (_ENABLE_WATCHDOG) {
-    log("Petting Watchdog...");
+//    prglog("Petting Watchdog...");
     P1.petWD();
   } else {
     tskWatchdog.disable();
