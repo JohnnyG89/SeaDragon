@@ -19,14 +19,16 @@ void initIOManager(void) {
 }
 
 void cyclicIOManager(void) {
-  logTaskTimer(&ts_high, "IOManager", "High");
+  logTaskTimer("IOManager");
 
   //Write outputs from logic processed LAST cycle
-  P1.writeDiscrete(outSlot2, 1, 0);
+  P1.writeDiscrete(MyFirstTimer.Q, 3, 0);
 
   //Read inputs for logic to be processed THIS cycle
-  inSlot1 = P1.readDiscrete(3);
+  inSlot1 = P1.readDiscrete(1);
   inDiscrete_1 = bitRead(inSlot1, 0);
+
+  prglog(String("In: " + String(inSlot1) + " Out: " + String(inDiscrete_1)).c_str());
   inWaterLevelSensor_1 = bitRead(inSlot1, 1);
   inWaterLevelSensor_2 = bitRead(inSlot1, 2);
   inWaterLevelSensor_3 = bitRead(inSlot1, 3);

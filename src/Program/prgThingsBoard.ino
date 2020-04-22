@@ -10,6 +10,7 @@
 R_TRIG TriggerTelemetryData;
 
 void initThingsBoard(void) {
+  return;
   prglog("Beginning ThingsBoard Initialization");
 
   if(!gEthernetConnectionActive){
@@ -38,17 +39,18 @@ void initThingsBoard(void) {
 }
 
 void cyclicThingsBoard(void) {
-  logTaskTimer(&ts_low, "ThingsBoard", "Low");
+  logTaskTimer("ThingsBoard");
 
   TriggerTelemetryData.process(switchState);
   if(TriggerTelemetryData.Q){
     int Temperature, Humidity;
-    Temperature = rtc.getSeconds();
-    Humidity = rtc.getMinutes();
+//    Temperature = rtc.getSeconds();
+//    Humidity = rtc.getMinutes();
     prglog(String("Sent Data: Temperature: " + String(Temperature) + " Humidity: " + String(Humidity) + ";").c_str());
     tb.sendTelemetryInt("temperature",Temperature);
     tb.sendTelemetryInt("humidity", Humidity);
   }
-  
+
+  tb.loop();
 
 }

@@ -23,7 +23,7 @@ void initWatchdog(void) {
 }
 
 void cyclicWatchdog(void) {
-  logTaskTimer(&ts_high, "Watchdog", "High");
+  logTaskTimer("Watchdog");
 
   if (_ENABLE_WATCHDOG) {
 //    prglog("Petting Watchdog...");

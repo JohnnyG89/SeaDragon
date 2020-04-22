@@ -37,6 +37,13 @@ void initHardwareManager(void) {
 }
 
 void cyclicHardwareManager(void) {
-  logTaskTimer(&ts_high, "Hardware Manager", "High");
-  
+  logTaskTimer("Hardware Manager");
+  //TODO: Check to make sure the base power is still active.  Return to init() if anything is lost
+  //statusBit = P1.check24V(1);  //Read the missing 24V bit on slot 1.
+  //bool underRangeBit = checkUnderRange(1,3) //Check under range bit on slot 1 channel 3.
+  //bool overRangeBit = checkOverRange(1,3) //Check over range bit on slot 1 channel 3.
+  //bool burnoutBit = checkBurnout(1,3) //Check under range bit on slot 1 channel 3.
+  //P1.readStatus(statusByteArray,1); //Store all Status Bytes of slot 1 into statusByteArray
 }
+
+//TODO:  SDU.h -> automatically install new project if it's on the SD Card

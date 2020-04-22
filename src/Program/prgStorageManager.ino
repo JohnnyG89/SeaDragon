@@ -54,11 +54,8 @@ void initStorageManager(void) {
 }
 
 void cyclicStorageManager(void) {
-  logTaskTimer(&ts_low, "StorageManager", "Low");
-
+  logTaskTimer("StorageManager");
 }
-
-
 
 void LogEntry(String s) {
   Serial.println(s);
@@ -74,29 +71,60 @@ void LogEntry(String s) {
   }
 }
 
-void logTaskTimer(Scheduler* pscheduler, String TaskName, String Priority) {
+//void logTaskTimer(Scheduler* pscheduler, String TaskName, String Priority) {
+//  Scheduler &s = Scheduler::currentScheduler();
+//  if (_DEBUG || _DEBUG_VERBOSE) {
+//    Task* pTask = s.getCurrentTask();
+//    if (pTask->getStartDelay() > BASE_CYCLE_TIME) {
+//      prglog(String(TaskName + " Task Delay of " + String(pTask->getStartDelay())).c_str());
+//    }
+//    if (_DEBUG_VERBOSE) {
+//      String TaskNameString, TaskInterval, StartDelay, Overrun, RunCounter, IterationCount, TimeUntilNextRun, PrintString;
+//      TaskNameString = String(TaskName);
+//      //TaskStart = String("Task started at: " + String(rtc.()) + ":"  + String(minute()) + ":" + String(second()) + ":" + String(millis()));
+//      TaskInterval = String("Interval: " + String(pTask->getInterval()));
+//      StartDelay = String("Start Delay: " + String(pTask->getStartDelay()));
+//      Overrun = String("Overrun: " + String(pTask->getOverrun()));
+//      RunCounter = String("Run Counter: " + String(pTask->getRunCounter()));
+//      IterationCount = String("Iteration Count: " + String(pTask->getIterations()));
+//      TimeUntilNextRun = String("Time Until Nex Run: " + String(pscheduler->timeUntilNextIteration(*pTask)));
+//      PrintString = String("Priority: " + Priority + ":" + TaskNameString + ":" + ", " + TaskInterval + ", " + StartDelay + ", " + Overrun + ", " + RunCounter + ", " + IterationCount + ";");
+//      prglog(PrintString.c_str());
+//    }
+//  }
+//}
+
+void logTaskTimer(String TaskName) {
+  Scheduler &s = Scheduler::currentScheduler();
+  
   if (_DEBUG || _DEBUG_VERBOSE) {
-    Task* pTask = pscheduler->getCurrentTask();
-    if (pTask->getStartDelay() > BASE_CYCLE_TIME) {
-      prglog(String(TaskName + " Task Delay of " + String(pTask->getStartDelay())).c_str());
+//    Task* pTask = s.getCurrentTask();
+    Task &pTask = s.currentTask();
+    if (pTask.getStartDelay() > BASE_CYCLE_TIME) {
+      prglog(String(TaskName + "::" + String(pTask.getId()) + " Task Delay of " + String(pTask.getStartDelay())).c_str());
     }
     if (_DEBUG_VERBOSE) {
       String TaskNameString, TaskInterval, StartDelay, Overrun, RunCounter, IterationCount, TimeUntilNextRun, PrintString;
       TaskNameString = String(TaskName);
       //TaskStart = String("Task started at: " + String(rtc.()) + ":"  + String(minute()) + ":" + String(second()) + ":" + String(millis()));
-      TaskInterval = String("Interval: " + String(pTask->getInterval()));
-      StartDelay = String("Start Delay: " + String(pTask->getStartDelay()));
-      Overrun = String("Overrun: " + String(pTask->getOverrun()));
-      RunCounter = String("Run Counter: " + String(pTask->getRunCounter()));
-      IterationCount = String("Iteration Count: " + String(pTask->getIterations()));
-      TimeUntilNextRun = String("Time Until Nex Run: " + String(pscheduler->timeUntilNextIteration(*pTask)));
-      PrintString = String("Priority: " + Priority + ":" + TaskNameString + ":" + ", " + TaskInterval + ", " + StartDelay + ", " + Overrun + ", " + RunCounter + ", " + IterationCount + ";");
+      TaskInterval = String("Interval: " + String(pTask.getInterval()));
+      StartDelay = String("Start Delay: " + String(pTask.getStartDelay()));
+      Overrun = String("Overrun: " + String(pTask.getOverrun()));
+      RunCounter = String("Run Counter: " + String(pTask.getRunCounter()));
+      IterationCount = String("Iteration Count: " + String(pTask.getIterations()));
+      TimeUntilNextRun = String("Time Until Nex Run: " + String(s.timeUntilNextIteration(pTask)));
+      PrintString = String(TaskNameString + ":" + ", " + TaskInterval + ", " + StartDelay + ", " + Overrun + ", " + RunCounter + ", " + IterationCount + ";");
       prglog(PrintString.c_str());
     }
   }
 }
 
 void logScheduler(Scheduler* pscheduler) {
+  //TODO:
+  //  Scheduler &s = Scheduler::currentScheduler();
+  //  Task &t = s.currentTask();
+
+
   if (_DEBUG || _DEBUG_VERBOSE) {
     if (pscheduler->isOverrun()) {
       prglog(String("Scheduler Overrun").c_str());

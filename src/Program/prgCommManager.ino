@@ -22,6 +22,6 @@ void initCommManager(void) {
 }
 
 void cyclicCommManager(void) {
-  logTaskTimer(&ts_high, "CommManager", "High");
+  logTaskTimer("CommManager");
    return;
 }

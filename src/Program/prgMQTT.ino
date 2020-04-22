@@ -42,38 +42,38 @@ bool switchState, _switchState;
 void initMQTT(void) {
   prglog("Beginning MQTT Configuration");
 
-//  Ethernet.init(5);   //CS pin for P1AM-ETH
-//  Ethernet.begin(mac);  // Get IP from DHCP
-//  Serial.println(Ethernet.localIP());
+  //  Ethernet.init(5);   //CS pin for P1AM-ETH
+  //  Ethernet.begin(mac);  // Get IP from DHCP
+  //  Serial.println(Ethernet.localIP());
 
-  if(!gEthernetConnectionActive){
+  if (!gEthernetConnectionActive) {
     prglog("MQTT Task: Ethernet Connection Not Active-Returning to try again later");
     return;
-  }else{
-
-  mqttClient.setUsernamePassword(UserName, Password);  // Username and Password tokens for Shiftr.io namespace. These can be found in the namespace settings.
-
-  prglog(String("Connecting to the MQTT broker: " + String(broker)).c_str());
-  if (!mqttClient.connect(broker, port)) {
-    prglog(String("MQTT connection failed! Error code = " + String(mqttClient.connectError())).c_str());
   } else {
-    prglog("You're connected to the MQTT broker!");
-//    gEthernetConnectionActive = true;
-    for (int ii_MQTT = 0; ii_MQTT < MQTT_CHANNEL_COUNT; ii_MQTT++) {
-      mqttClient.subscribe(ChannelName[ii_MQTT]); //Subscribe to "InputReading" topic
-      prglog(String("Subscribed To Channel: " + String(ChannelName[ii_MQTT])).c_str());
-    }
-  }
 
-  tskMQTT.setCallback(&cyclicMQTT);
+    mqttClient.setUsernamePassword(UserName, Password);  // Username and Password tokens for Shiftr.io namespace. These can be found in the namespace settings.
+
+    prglog(String("Connecting to the MQTT broker: " + String(broker)).c_str());
+    if (!mqttClient.connect(broker, port)) {
+      prglog(String("MQTT connection failed! Error code = " + String(mqttClient.connectError())).c_str());
+    } else {
+      prglog("You're connected to the MQTT broker!");
+      //    gEthernetConnectionActive = true;
+      for (int ii_MQTT = 0; ii_MQTT < MQTT_CHANNEL_COUNT; ii_MQTT++) {
+        mqttClient.subscribe(ChannelName[ii_MQTT]); //Subscribe to "InputReading" topic
+        prglog(String("Subscribed To Channel: " + String(ChannelName[ii_MQTT])).c_str());
+      }
+    }
+
+    tskMQTT.setCallback(&cyclicMQTT);
   }
   prglog("Initialized MQTT Task");
 }
 
 void cyclicMQTT(void) {
-  logTaskTimer(&ts_low, "MQTT", "Low");
+  logTaskTimer("MQTT");
   return;
-  
+
   if (gEthernetConnectionActive) {
     RandomMQTTValueGenerator();
 
@@ -83,7 +83,7 @@ void cyclicMQTT(void) {
         if (MessageTxRxTracker[ii_MQTT]) {
           prglog(String("Channel: " + String(ii_MQTT) + " sent message before last one was acknowledged").c_str());
         } else {
-          MessageTxRxTracker[ii_MQTT]=true;
+          MessageTxRxTracker[ii_MQTT] = true;
         }
 
         mqttClient.beginMessage(ChannelName[ii_MQTT]);  //Topic name
@@ -99,6 +99,10 @@ void cyclicMQTT(void) {
     int mqttValue = checkBroker();  //Check for new messages
     if (mqttValue != -1) { // -1 means we didn't get a new message
     }
+  } else {
+    prglog("Lost Ethernet Connection.  Returning to task initialization function");
+    tskMQTT.setCallback(&initMQTT);
+    return;
   }
 
 }
@@ -133,3 +137,5 @@ int checkBroker() {
   }
   return messageValue;
 }
+
+//TODO:  See example in PubSubClient for a non-blocking reconnect scheme

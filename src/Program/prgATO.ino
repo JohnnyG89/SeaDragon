@@ -18,7 +18,7 @@ void initATO(void) {
 }
 
 void cyclicATO(void) {
-  logTaskTimer(&ts_high, "ATO", "High");
+  logTaskTimer("ATO");
    tmrMaxATOOnTime.process(outATOPump);
 
   //If all 3 sensors are out of water, turn on the ATO

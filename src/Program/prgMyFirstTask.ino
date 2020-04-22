@@ -8,7 +8,7 @@
 #include "Global_Includes.h"
 
 
-TON MyFirstTimer(2000);
+
 
 void initMyFirstTask(void) {
   prglog("Initializing Example Task");
@@ -16,11 +16,10 @@ void initMyFirstTask(void) {
   tskMyFirstTask.setCallback(&cyclicMyFirstTask);
 
   prglog("Initialized Example Task");
-
 }
 
 void cyclicMyFirstTask(void) {
-  logTaskTimer(&ts_high, "MyFirstTask", "High");
+  logTaskTimer("MyFirstTask");
   switchState = digitalRead(SWITCH_BUILTIN);//Read the state of the switch
   MyFirstTimer.process(switchState);
   digitalWrite(LED_BUILTIN, MyFirstTimer.Q); //Update the LED
