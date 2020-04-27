@@ -13,17 +13,24 @@ const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 
 void initNTP(void) {
+
+  if(!_ENABLE_NTP){
+    prglog("NTP Disabled");
+    tskNTP.disable();
+    return;
+  }
+  
   prglog("Beginning RTC Initialization");
 
 //  rtc.begin();
 
   if (_ENABLE_COMMS) {
     prglog("Comms enabled, beginning clock sync procedure");
-//    if (rtc.getEpoch() > 1585302206) {
-//      prglog("Time already set, not enabling NTP");
-//    } else {
-//      prglog("Time not set, enabling NTP");
-//    }
+    if (rtc.getEpoch() > 1585302206) {
+      prglog("Time already set, not enabling NTP");
+    } else {
+      prglog("Time not set, enabling NTP");
+    } 
     PrintTime();
   } else {
     prglog("Comms disabled, Not syncing RTC");
@@ -55,12 +62,11 @@ void cyclicNTP(void) {
       unsigned long epoch = secsSince1900 - seventyYears + TimeZone * 3600;
       // print Unix time:
       prglog(String("Unix time = " + String(epoch)).c_str());
-//      rtc.setEpoch(epoch);
+      rtc.setEpoch(epoch); //TODO: get system clock epoch set function
       PrintTime();
       tskNTP.disable();
     }
   }
-
 }
 
 void sendNTPpacket(const char * address) {
@@ -85,6 +91,6 @@ void sendNTPpacket(const char * address) {
   Udp.endPacket();
 }
 
-void PrintTime(void) {
-//  prglog(String("Time: " + String(rtc.getMonth()) + "/" + String(rtc.getDay()) + "/" + String(rtc.getYear()) + "-" + String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds())).c_str());
+void PrintTime(void) { //TODO: Print Time!
+  prglog(String("Time: " + String(rtc.getMonth()) + "/" + String(rtc.getDay()) + "/" + String(rtc.getYear()) + "-" + String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds())).c_str());
 }

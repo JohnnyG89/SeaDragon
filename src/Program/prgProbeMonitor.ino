@@ -7,31 +7,26 @@
 //                                                          Reef On
 #include "Global_Includes.h"
 
-TON tmrMaxATOOnTime(10000);
-bool oLEDBuffer[1000];
+//This task is meant to monitor the reading of the pH sensor:
+//https://www.dfrobot.com/product-1782.html
 
-void initATO(void) {
-  if (!_ENABLE_ATO) {
-    prglog("Disabling ATO Task...");
-    tskATO.disable();
-    return;
-  }
+//Wiring:
+//Black: GND
+//Red: +5V
+//Blue: Analog Input
 
-  prglog("Initializing ATO...");
-  tskATO.setCallback(&cyclicATO);
-  prglog("Initialized ATO");
+//Use moving avg. function to mitigate the effects of random noise
+//Take that value and put it into the spline function, pH=f(Voltage;)
+
+
+void initProbeMonitor(void) {
+  prglog("Beginning ProbeMonitor Initialization");
+
+  tskProbeMonitor.setCallback(&cyclicProbeMonitor);
+
+  prglog("Finished ProbeMonitor Initialization");
 }
 
-void cyclicATO(void) {
-  logTaskTimer("ATO");
-
-  Scheduler &s = Scheduler::currentScheduler();
-  Task &pTask = s.currentTask();
-  
-  oLEDIndicator = pTask.getRunCounter()%2==0;
-
-//  //If all 3 sensors are out of water, turn on the ATO
-//  if (!inWaterLevelSensor_1 && !inWaterLevelSensor_2 && !inWaterLevelSensor_3 && !tmrMaxATOOnTime.Q) {
-//
-//  }
+void cyclicProbeMonitor(void) {
+  logTaskTimer("ProbeMonitor");
 }

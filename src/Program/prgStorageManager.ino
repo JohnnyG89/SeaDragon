@@ -98,7 +98,6 @@ void logTaskTimer(String TaskName) {
   Scheduler &s = Scheduler::currentScheduler();
   
   if (_DEBUG || _DEBUG_VERBOSE) {
-//    Task* pTask = s.getCurrentTask();
     Task &pTask = s.currentTask();
     if (pTask.getStartDelay() > BASE_CYCLE_TIME) {
       prglog(String(TaskName + "::" + String(pTask.getId()) + " Task Delay of " + String(pTask.getStartDelay())).c_str());
@@ -124,8 +123,7 @@ void logScheduler(Scheduler* pscheduler) {
   //  Scheduler &s = Scheduler::currentScheduler();
   //  Task &t = s.currentTask();
 
-
-  if (_DEBUG || _DEBUG_VERBOSE) {
+  if (_DEBUG) {
     if (pscheduler->isOverrun()) {
       prglog(String("Scheduler Overrun").c_str());
     }
@@ -140,8 +138,8 @@ void logScheduler(Scheduler* pscheduler) {
       PrintString = String("Scheduler Completed Pass." + CPULoad_idle + "," + CPULoad_cycle + "," + CPULoad_total + ", " + SchedulerIsOverran);
       prglog(PrintString.c_str());
     }
-
-
   }
   pscheduler->cpuLoadReset();
 }
+
+//TODO: Non-blocking read/write from sd.h examples
