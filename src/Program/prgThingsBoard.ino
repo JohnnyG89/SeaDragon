@@ -11,50 +11,86 @@
 #define THINGSBOARD_SERVER  "192.168.1.200"
 
 R_TRIG TriggerTelemetryData;
+int ii;
 
 void initThingsBoard(void) {
-  prglog("Beginning ThingsBoard Initialization");
+  //  tskThingsBoard.disable();
+  //  return;
+  prglog("ThingsBoard::Beginning ThingsBoard Initialization");
+
 
   if (!gEthernetConnectionActive) {
-    prglog("ThingsBoardTask:Ethernet Connection Not Active-Returning to try again later");
+    prglog("ThingsBoard:: Ethernet Connection Not Active-Returning to try again later");
     return;
   }
 
   if (!tb.connected()) {
     // Connect to the ThingsBoard
-    prglog("Connecting to: ");
+    prglog("ThingsBoard::Connecting to: ");
     prglog(THINGSBOARD_SERVER);
     prglog(" with token ");
     prglog(TOKEN);
     if (!tb.connect(THINGSBOARD_SERVER, TOKEN)) {
-      prglog("Failed to connect");
+      prglog("ThingsBoard::Failed to connect");
       return;
     } else {
-      prglog(String("Connected To: " + String(THINGSBOARD_SERVER)).c_str());
+      prglog(String("ThingsBoard::Connected To: " + String(THINGSBOARD_SERVER)).c_str());
     }
   }
 
+  ii = 0;
+
   tskThingsBoard.setCallback(&cyclicThingsBoard);
 
-  prglog("Finished ThingsBoard Initialization");
+  prglog("ThingsBoard::Finished ThingsBoard Initialization");
 }
-
-int Temperature, Humidity;
 
 void cyclicThingsBoard(void) {
   logTaskTimer("ThingsBoard");
 
   if (!tb.connected()) {
     tskThingsBoard.setCallback(&initThingsBoard);
-    prglog("Disconnected from ThingsBoard Server");
+    prglog("ThingsBoard::Disconnected from ThingsBoard Server");
     return;
   }
 
-  Temperature++;
-  Humidity--;
-  prglog(String("Sent Data: Temperature: " + String(Temperature) + " Humidity: " + String(Humidity) + ";").c_str());
-  tb.sendTelemetryInt("temperature", Temperature);
-  tb.sendTelemetryInt("pH", iAnalogValue);
+  tb.sendTelemetryInt("MessageIndex", ii);
+  switch (ii % 8) {
+    case 0:
+      tb.sendTelemetryInt("iTemperature", iTemperature);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iTemperature" + " :: Value " + String(iTemperature) + " ::").c_str());
+      break;
+    case 1:
+      tb.sendTelemetryFloat("iAnalogInput_Raw", iAnalogValue);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iAnalogInput_Raw" + " :: Value " + String(iAnalogValue) + " ::").c_str());
+      break;
+    case 2:
+      tb.sendTelemetryFloat("iAnalogInput_Filtered", smoothedSensorValueAvg);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iAnalogInput_Filtered" + " :: Value " + String(smoothedSensorValueAvg) + " ::").c_str());
+      break;
+    case 3:
+      tb.sendTelemetryFloat("ipH",  ipHSensorReading);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "ipH" + " :: Value " + String(ipHSensorReading) + " ::").c_str());
+      break;
+    case 4:
+      tb.sendTelemetryBool("iSensor_CabinetDoor",  iCabinetDoorSensor);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iSensor_CabinetDoor" + " :: Value " + String(iCabinetDoorSensor) + " ::").c_str());
+      break;
+    case 5:
+      tb.sendTelemetryBool("iSwitch_PLC", iSwitchState);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iSwitch_PLC" + " :: Value " + String(iSwitchState) + " ::").c_str());
+      break;
+    case 6:
+      tb.sendTelemetryBool("oLight_Freshwater", oFreshwaterLightOutput);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "oLight_Freshwater" + " :: Value " + String(oFreshwaterLightOutput) + " ::").c_str());
+      break;
+    case 7:
+      tb.sendTelemetryBool("oLight_Cabinet",  oCabinetLight);
+      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "oLight_Cabinet" + " :: Value " + String(oCabinetLight) + " ::").c_str());
+      break;
+  }
+  ii++;
+
   tb.loop();
 }
 

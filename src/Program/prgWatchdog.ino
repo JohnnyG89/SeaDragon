@@ -12,7 +12,7 @@ void initWatchdog(void) {
 
   if (_ENABLE_WATCHDOG) {
     prglog("Enabling Watchdog Timer");
-    P1.configWD(WATCHDOG_TIMEOUT, TOGGLE);
+    P1.configWD(10000, HOLD);
     P1.startWD();
   } else {
     prglog("Not Enabling Watchdog Timer");
@@ -26,7 +26,7 @@ void cyclicWatchdog(void) {
   logTaskTimer("Watchdog");
 
   if (_ENABLE_WATCHDOG) {
-//    prglog("Petting Watchdog...");
+    //    prglog("Petting Watchdog...");
     P1.petWD();
   } else {
     tskWatchdog.disable();

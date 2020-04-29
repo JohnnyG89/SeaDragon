@@ -7,18 +7,25 @@
 //                                                          Reef On
 #include "Global_Includes.h"
 
+
+
 TON tmrMaxATOOnTime(10000);
 bool oLEDBuffer[1000];
 
+//Scheduler &s = Scheduler::currentScheduler();
+//  Task &t = s.currentTask();
+
 void initATO(void) {
+  Task &t = Scheduler::currentScheduler().currentTask();
+  
   if (!_ENABLE_ATO) {
     prglog("Disabling ATO Task...");
-    tskATO.disable();
+    t.disable();
     return;
   }
 
   prglog("Initializing ATO...");
-  tskATO.setCallback(&cyclicATO);
+  t.setCallback(&cyclicATO);
   prglog("Initialized ATO");
 }
 

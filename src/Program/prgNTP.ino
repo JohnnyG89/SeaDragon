@@ -15,30 +15,30 @@ byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packe
 void initNTP(void) {
 
   if(!_ENABLE_NTP){
-    prglog("NTP Disabled");
+    prglog("NTP::NTP Disabled");
     tskNTP.disable();
     return;
   }
   
-  prglog("Beginning RTC Initialization");
+  prglog("NTP::Beginning RTC Initialization");
 
-//  rtc.begin();
+  rtc.begin();
 
   if (_ENABLE_COMMS) {
-    prglog("Comms enabled, beginning clock sync procedure");
+    prglog("NTP::Comms enabled, beginning clock sync procedure");
     if (rtc.getEpoch() > 1585302206) {
-      prglog("Time already set, not enabling NTP");
+      prglog("NTP::Time already set, not enabling NTP");
     } else {
-      prglog("Time not set, enabling NTP");
+      prglog("NTP::Time not set, enabling NTP");
     } 
     PrintTime();
   } else {
-    prglog("Comms disabled, Not syncing RTC");
+    prglog("NTP::Comms disabled, Not syncing RTC");
   }
   Udp.begin(NTPPort);
   tskNTP.setCallback(&cyclicNTP);
 
-  prglog("Finished RTC Initialization");
+  prglog("NTP::Finished RTC Initialization");
 }
 
 void cyclicNTP(void) {
@@ -46,11 +46,11 @@ void cyclicNTP(void) {
 //  prglog("In the NTP Task?");
 //  return;
   if (!gTimeSet && _ENABLE_COMMS) { //Don't send the NTP Packet if we've already set the time (TODO: Find a better way to set the time!)
-    prglog("Sending NTP Packet...");
+    prglog("NTP::Sending NTP Packet...");
     sendNTPpacket(TimeServer); //Send the NTP packet to NIST.
     prglog("Sent NTP Packet...");
     if (Udp.parsePacket()) {// We've received a packet, read the data from it
-      prglog("Rec'd UDP Packet");
+      prglog("NTP::Rec'd UDP Packet");
       gTimeSet = true; //Mark that we've already set the time!
       Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
       unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);// the timestamp starts at byte 40 of the received packet and is four bytes,
@@ -58,7 +58,7 @@ void cyclicNTP(void) {
       // combine the four bytes (two words) into a long integer
       // this is NTP time (seconds since Jan 1 1900):
       unsigned long secsSince1900 = highWord << 16 | lowWord;
-      prglog(String("Seconds since Jan 1 1900 = " + String(secsSince1900)).c_str());
+      prglog(String("NTP::Seconds since Jan 1 1900 = " + String(secsSince1900)).c_str());
       unsigned long epoch = secsSince1900 - seventyYears + TimeZone * 3600;
       // print Unix time:
       prglog(String("Unix time = " + String(epoch)).c_str());

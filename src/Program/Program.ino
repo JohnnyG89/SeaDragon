@@ -18,43 +18,33 @@ Scheduler ts_high, ts_low;
 //Watchdog Task
 void initWatchdog();
 void cyclicWatchdog();
-Task tskWatchdog(           WATCHDOG_TIMEOUT / 2,     TASK_FOREVER,    &initWatchdog,          &ts_high,   true);
+Task tskWatchdog(           5000,     TASK_FOREVER,       &initWatchdog,         &ts_high,   true);
 
 //Hardware Manager - Initialization of P1AM IO modules
 void initHardwareManager();
 void cyclicHardwareManager();
-Task tskHardwareManager(    BASE_CYCLE_TIME,          TASK_FOREVER,    &initHardwareManager,   &ts_high,   true);
-//
-////IO Manager - Mapping program inputs/outputs to their IO modules
-//void initIOManager();
-//void cyclicIOManager();
-//Task tskIOManager(          BASE_CYCLE_TIME,          TASK_FOREVER,   &initIOManager,         &ts_high,   true);
+Task tskHardwareManager(    200,      TASK_FOREVER,      &initHardwareManager,  &ts_high,   true);
 
-//IO Manager - Mapping program inputs/outputs to their IO modules
+//Comm Manager - Manage the ethernet connections for the various other programs that rely on it
 void initCommManager();
 void cyclicCommManager();
-Task tskCommManager(        BASE_CYCLE_TIME,          TASK_FOREVER,    &initCommManager,       &ts_high,   true);
-//
-////Example Task : Set the onboard LED to the state of the switch
-//void initMyFirstTask();
-//void cyclicMyFirstTask();
-//Task tskMyFirstTask(        BASE_CYCLE_TIME,          TASK_FOREVER,    &initMyFirstTask,       &ts_high,   true);
+Task tskCommManager(        500,      TASK_FOREVER,      &initCommManager,      &ts_high,   true);
 
 //ATO:  Auto top-off system
 void initATO();
 void cyclicATO();
-Task tskATO(                BASE_CYCLE_TIME,          TASK_FOREVER,    &initATO,               &ts_high,   true);
+Task tskATO(                200,      TASK_FOREVER,    &initATO,              &ts_high,   true);
 
 //TODO: If you're going to use Chronos, it's incompatible with RTCZero
 ////Alarms: Warnings, Faults, Messages that require operator attention
-//void initAlarms();
-//void cyclicAlarms();
-//Task tskAlarms(             BASE_CYCLE_TIME,          TASK_FOREVER,    &initAlarms,            &ts_high,   true);
+void initAlarms();
+void cyclicAlarms();
+Task tskAlarms(             500,      TASK_FOREVER,    &initAlarms,            &ts_high,   true);
 
 //Alarms: Warnings, Faults, Messages that require operator attention
 void initProbeMonitor();
 void cyclicProbeMonitor();
-Task tskProbeMonitor(       BASE_CYCLE_TIME,          TASK_FOREVER,    &initProbeMonitor,      &ts_high,   true);
+Task tskProbeMonitor(       200,      TASK_FOREVER,    &initProbeMonitor,      &ts_high,   true);
 
 //
 //Low Priority tasks
@@ -68,46 +58,60 @@ Task tskProbeMonitor(       BASE_CYCLE_TIME,          TASK_FOREVER,    &initProb
 //ThingsBoard - Connect with the ThingsBoard platform
 void initThingsBoard();
 void cyclicThingsBoard();
-Task tskThingsBoard(        LOW_PRIORITY_CYCLE_TIME,   TASK_FOREVER,    &initThingsBoard,      &ts_low,   true);
+Task tskThingsBoard(        2500,   TASK_FOREVER,    &initThingsBoard,      &ts_low,   true);
 
 //NTP - Manage sync'ing the system time
 //with the NIST time server
 void initNTP();
 void cyclicNTP();
-Task tskNTP(                LOW_PRIORITY_CYCLE_TIME,   TASK_FOREVER,    &initNTP,              &ts_low,   true);
+Task tskNTP(                50,   TASK_FOREVER,    &initNTP,              &ts_low,   true);
 
 //Storage Manager - Manage the SD card
 void initStorageManager();
 void cyclicStorageManager();
-Task tskStorageManager(     LOW_PRIORITY_CYCLE_TIME,   TASK_FOREVER,    &initStorageManager,    &ts_low,  true);
+Task tskStorageManager(     100,   TASK_FOREVER,    &initStorageManager,    &ts_low,  true);
 
-//TODO: Task Timeouts? (task.setTimeout())?
 //Execution
 void setup() {
   Serial.begin(115200);               //Initialize serial communication at 0.5M bits per second
   while (!Serial) {}                  //Wait for Serial Port to be opened
   prglog("Initialized Serial Communications");
-  prglog("Starting Task Timers");
+//  prglog("Starting Task Timers");
   //TODO: Test, not 100% sure how this works w/ multiple task timers
+  //TODO: Call ts.init()?
   ts_high.startNow();
   ts_low.startNow();
 
-  prglog("Setting High Priority Scheduler...");
+//  prglog("Setting High Priority Scheduler...");
   ts_low.setHighPriorityScheduler(&ts_high);
 }
 
 void loop() {
   ts_low.execute();
-  logScheduler(&ts_low);
+//  logScheduler(&ts_low);
 }
 
 //GENERAL TODO:
-//Smooth out the pH signal w/ moving average
-//Calibration of the pH probe (Maybe Calibrator.h)
 //CNC-like plotter for feeding corals lol
 //Status Indication on the front LED
-//Find old electronics components
 //Ring-buffer
 //switches may need debouncing
 //blinking pattern of the lights
 //ArduinoUnit unittesting library
+//Scheduler &s = Scheduler::currentScheduler();
+//  Task &t = s.currentTask();
+//libs
+//AD_Sensors
+//Adafruit ZeroTimer Library
+//ArduinoLog
+//dbg-trace
+//Debug
+//ESP Logger
+//JsonLogger
+//Log
+//Logger
+//M2M Solutions Logger Library
+//Unified Log
+//Arduino_DebugUtils
+//Scheduler
+//Difference in cooperative and collaborative task schedulers?
