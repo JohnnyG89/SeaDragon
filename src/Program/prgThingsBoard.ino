@@ -10,83 +10,76 @@
 #define TOKEN               "VqSbL0ENWMvPUA7GTLBd"
 #define THINGSBOARD_SERVER  "192.168.1.200"
 
-R_TRIG TriggerTelemetryData;
+//R_TRIG TriggerTelemetryData;
 int ii;
 
 void initThingsBoard(void) {
-  //  tskThingsBoard.disable();
-  //  return;
-  prglog("ThingsBoard::Beginning ThingsBoard Initialization");
-
+  Log.notice("ThingsBoard:: Beginning ThingsBoard Initialization");
 
   if (!gEthernetConnectionActive) {
-    prglog("ThingsBoard:: Ethernet Connection Not Active-Returning to try again later");
+    Log.warning("ThingsBoard:: Ethernet Connection Not Active-Returning to try again later");
     return;
   }
 
   if (!tb.connected()) {
     // Connect to the ThingsBoard
-    prglog("ThingsBoard::Connecting to: ");
-    prglog(THINGSBOARD_SERVER);
-    prglog(" with token ");
-    prglog(TOKEN);
+    Log.notice("ThingsBoard:: Connecting to %s with token %s ::", THINGSBOARD_SERVER, TOKEN);
     if (!tb.connect(THINGSBOARD_SERVER, TOKEN)) {
-      prglog("ThingsBoard::Failed to connect");
+      Log.warning("ThingsBoard:: Failed to connect");
       return;
     } else {
-      prglog(String("ThingsBoard::Connected To: " + String(THINGSBOARD_SERVER)).c_str());
+      Log.notice("ThingsBoard:: Connected to broker at %s with token %s", THINGSBOARD_SERVER, TOKEN);
     }
   }
 
   ii = 0;
+  Scheduler::currentScheduler().currentTask().setCallback(&cyclicThingsBoard);
 
-  tskThingsBoard.setCallback(&cyclicThingsBoard);
-
-  prglog("ThingsBoard::Finished ThingsBoard Initialization");
+  Log.notice("ThingsBoard:: Finished ThingsBoard Initialization");
 }
 
 void cyclicThingsBoard(void) {
   logTaskTimer("ThingsBoard");
 
   if (!tb.connected()) {
-    tskThingsBoard.setCallback(&initThingsBoard);
-    prglog("ThingsBoard::Disconnected from ThingsBoard Server");
+    Scheduler::currentScheduler().currentTask().setCallback(&initThingsBoard);
+    Log.notice("ThingsBoard:: Disconnected from ThingsBoard Server");
     return;
   }
 
   tb.sendTelemetryInt("MessageIndex", ii);
   switch (ii % 8) {
     case 0:
-      tb.sendTelemetryInt("iTemperature", iTemperature);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iTemperature" + " :: Value " + String(iTemperature) + " ::").c_str());
+      tb.sendTelemetryFloat("iTemperature", iTemperature);
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %F ::", ii, THINGSBOARD_SERVER, "iTemperature", iTemperature);
       break;
     case 1:
       tb.sendTelemetryFloat("iAnalogInput_Raw", iAnalogValue);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iAnalogInput_Raw" + " :: Value " + String(iAnalogValue) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %F ::", ii, THINGSBOARD_SERVER, "iAnalogInput_Raw", iAnalogValue);
       break;
     case 2:
       tb.sendTelemetryFloat("iAnalogInput_Filtered", smoothedSensorValueAvg);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iAnalogInput_Filtered" + " :: Value " + String(smoothedSensorValueAvg) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %F ::", ii, THINGSBOARD_SERVER, "iAnalogInput_Filtered", smoothedSensorValueAvg);
       break;
     case 3:
       tb.sendTelemetryFloat("ipH",  ipHSensorReading);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "ipH" + " :: Value " + String(ipHSensorReading) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %F ::", ii, THINGSBOARD_SERVER, "ipH", ipHSensorReading);
       break;
     case 4:
       tb.sendTelemetryBool("iSensor_CabinetDoor",  iCabinetDoorSensor);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iSensor_CabinetDoor" + " :: Value " + String(iCabinetDoorSensor) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %T ::", ii, THINGSBOARD_SERVER, "iSensor_CabinetDoor", iCabinetDoorSensor);
       break;
     case 5:
       tb.sendTelemetryBool("iSwitch_PLC", iSwitchState);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "iSwitch_PLC" + " :: Value " + String(iSwitchState) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %T ::", ii, THINGSBOARD_SERVER, "iSwitch_PLC", iSwitchState);
       break;
     case 6:
       tb.sendTelemetryBool("oLight_Freshwater", oFreshwaterLightOutput);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "oLight_Freshwater" + " :: Value " + String(oFreshwaterLightOutput) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %T ::", ii, THINGSBOARD_SERVER, "oLight_Freshwater", oFreshwaterLightOutput);
       break;
     case 7:
       tb.sendTelemetryBool("oLight_Cabinet",  oCabinetLight);
-      prglog(String("ThingsBoard:: id " + String(ii) + " :: Sent Data to " + String(THINGSBOARD_SERVER) + ":: Channel " + "oLight_Cabinet" + " :: Value " + String(oCabinetLight) + " ::").c_str());
+      Log.notice("ThingsBoard:: Msg %d :: Sent Data To %s :: Channel %s :: Value %T ::", ii, THINGSBOARD_SERVER, "oLight_Cabinet", oCabinetLight);
       break;
   }
   ii++;

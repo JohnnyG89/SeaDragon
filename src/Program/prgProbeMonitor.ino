@@ -27,26 +27,25 @@ int ret;
 
 
 void initProbeMonitor(void) {
-  prglog("ProbeMonitor::Beginning ProbeMonitor Initialization");
+  Log.trace("ProbeMonitor:: Beginning ProbeMonitor Initialization");
 
-  phSensor.begin(SMOOTHED_AVERAGE, 50);  
+  phSensor.begin(SMOOTHED_AVERAGE, 20);  
 
   ret = fitCurve(order, sizeof(x)/sizeof(double), x, y, sizeof(coeffs)/sizeof(double), coeffs);
 
-  prglog(String("ProbeMonitor::Coeff. Calc Status= " + String(ret) + " :: Order= " + String(order)).c_str());
+  Log.verbose("ProbeMonitor:: Coefficients calculation status = %d :: Order = %d ::", ret, order);
 
   if(ret==0){
-    prglog("Coefficients Are:");
     for(int ii=0; ii <= order; ii++){
-      prglog(String("ProbeMonitor::Coeff.: " + String(ii) + " Value: " + String(coeffs[ii])).c_str());
+      Log.notice("ProbeMonitor:: Coefficient %d :: Value %F ::", ii, coeffs[ii]);
     }
   }else{
-    prglog(String("ProbeMonitor::Error calculating coefficients" + String(ret)).c_str());
+      Log.error("ProbeMonitor:: Failed to calculate coefficients.  Error status = %d ::", ret);
   }
+  
+  Scheduler::currentScheduler().currentTask().setCallback(&cyclicProbeMonitor);
 
-  tskProbeMonitor.setCallback(&cyclicProbeMonitor);
-
-  prglog("ProbeMonitor::Finished ProbeMonitor Initialization");
+  Log.trace("ProbeMonitor:: Finished ProbeMonitor Initialization");
 }
 
 void cyclicProbeMonitor(void) {
@@ -58,8 +57,8 @@ void cyclicProbeMonitor(void) {
   for(int ii=0; ii <= order; ii++){
     ipHSensorReading += (coeffs[ii]*(pow(smoothedSensorValueAvg, order-ii)));
   }
-  
-  prglog(String("ProbeMonitor::Original Sensor Value= " + String(iAnalogValue) + " :: Smoothed Float Value=" + String(smoothedSensorValueAvg) + " :: Calibrated Value= " + String(ipHSensorReading)).c_str());
+
+  Log.verbose("ProbeMonitor:: Original Sensor Value = %F :: Smoothed Float Value = %F :: Calibrated Value = %F", iAnalogValue, smoothedSensorValueAvg, ipHSensorReading);
 
   logTaskTimer("ProbeMonitor");
 }

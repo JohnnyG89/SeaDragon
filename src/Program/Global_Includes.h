@@ -24,7 +24,6 @@
 #define _ENABLE_ATO           true
 #define _ENABLE_ALARMS        false
 #define _ENABLE_NTP           true
-#define _CHECK_MODULE_STATUS  false
 
 //TaskScheduler Compiler Flags
 #define _TASK_TIMECRITICAL          // Enable monitoring scheduling overruns
@@ -42,20 +41,13 @@
 // #define _TASK_DEFINE_MILLIS      // Force forward declaration of millis() and micros() "C" style
 #define _TASK_EXPOSE_CHAIN          // Methods to access tasks in the task chain
 
-//Set logging settings in debug vs. production/deployment (Debug Stripping)
-#if _DEBUG
-#define prglog(s) {LogEntry(F(s));}
-#else
-#define prglog(s)        //Direct the compiler to replace the prglog() function with void (performance optimization)
-#endif
-
 #define TimeZone -4
 #define seventyYears  2208988800UL
 
 #include <ThingsBoard.h>
 #include <SD.h>
 #include <P1AM.h>
-#include <plclib.h>
+//#include <plclib.h>
 #include <TaskSchedulerSleepMethods.h>
 #include <TaskSchedulerDeclarations.h>
 #include <TaskScheduler.h>
@@ -63,55 +55,54 @@
 #include <Ethernet.h>
 #include <Smoothed.h>
 #include <curveFitting.h>
+#include <CronAlarms.h>
+#include <ArduinoLog.h>
 
 EthernetClient client;
 ThingsBoard tb(client);
 RTCZero rtc;
 EthernetUDP Udp;
 
-byte mac[] = {0x60, 0x52, 0xD0, 0x06, 0x68, 0x2E};
-
-//Constants for the IO module slots
-const uint8_t P1_SLOT_RTD =  1;
-const uint8_t P1_SLOT_AIO =  2;
-const uint8_t P1_SLOT_DO  =  3;
-const uint8_t P1_SLOT_DI  =  4;
-const uint8_t P1_SLOT_RO  =  5;
-
-const uint8_t P1_MODULE_COUNT = 5;
-
-const char* baseArray[] = { "P1-04RTD", "P1-4ADL2DAL-2", "P1-08TD2", "P1-08ND3", "P1-08TRS"}; //Expected Modules
 
 bool gTimeSet = false, gEthernetConnectionActive = false;
-//TODO:  Instead of passing pointer to the active task, just get it from the scheduler so you don't have to declare, schedule the task
 
-//IO Buffer
-uint32_t outDiscreteDataBuffer;
-uint32_t outRelayDataBuffer;
-uint32_t inDiscreteDataBuffer;
+////IO Buffer
+//uint32_t outDiscreteDataBuffer;
+//uint32_t outRelayDataBuffer;
+//uint32_t inDiscreteDataBuffer;
 
 //IO Bits - On the PLC itself
 bool iSwitchState;
 bool oLEDIndicator;
-
-//IO Bits- Wired into slices
 bool iCabinetDoorSensor;
-channelLabel bin_DoorSwitch = {P1_SLOT_DI, 0};
-
 bool oCabinetLight;
-channelLabel bout_CabinetLight = {P1_SLOT_RO, 2};
-
 bool oFreshwaterLightOutput;
-channelLabel bout_FreshwaterGooseneck = {P1_SLOT_RO, 1};
-
-//AIO Data
 int iAnalogValue = -1;
-channelLabel ain_pH = {P1_SLOT_AIO, 1};
 float smoothedSensorValueAvg;
 double ipHSensorReading;
-
 float iTemperature;
-channelLabel ain_Temp = {P1_SLOT_RTD, 1};
-const char P1_04RTD_CONFIG[] = { 0x40, 0x03, 0x60, 0x05, 0x20, 0x07, 0x80, 0x00 };
-
 #endif
+
+//
+//    Log.notice   (  "Log as Info with integer values : %d, %d" CR                  , intValue1,  intValue2);
+//    Log.notice   (F("Log as Info with hex values     : %x, %X" CR                 ), intValue1,  intValue1);
+//    Log.notice   (  "Log as Info with hex values     : %x, %X" CR                  , intValue2,  intValue2);
+//    Log.notice   (F("Log as Info with binary values  : %b, %B" CR                 ), intValue1,  intValue1);
+//    Log.notice   (  "Log as Info with binary values  : %b, %B" CR                  , intValue2,  intValue2);
+//    Log.notice   (F("Log as Info with long values    : %l, %l" CR                 ), longValue1, longValue2);
+//    Log.notice   (  "Log as Info with bool values    : %t, %T" CR                  , boolValue1, boolValue2);
+//    Log.notice   (F("Log as Info with string value   : %s" CR                     ), charArray);
+//    Log.notice   (  "Log as Info with Flash string value   : %S" CR                , flashCharArray1);
+//    Log.notice   (  "Log as Info with Flash string value   : %S" CR                , flashCharArray2);
+//    Log.notice   (  "Log as Info with string value   : %s" CR                      , stringValue1.c_str());
+//    Log.notice   (F("Log as Info with float value   : %F" CR                      ), floatValue);
+//    Log.notice   (  "Log as Info with float value   : %F" CR                       , floatValue);
+//    Log.notice   (F("Log as Info with double value   : %D" CR                     ), doubleValue);
+//    Log.notice   (  "Log as Info with double value   : %D" CR                      , doubleValue);
+//    Log.notice   (F("Log as Debug with mixed values  : %d, %d, %l, %l, %t, %T" CR ), intValue1 , intValue2,
+//                longValue1, longValue2, boolValue1, boolValue2);
+//    Log.trace    (  "Log as Trace with bool value    : %T" CR                      , boolValue1);
+//    Log.warning  (  "Log as Warning with bool value  : %T" CR                      , boolValue1);
+//    Log.error    (  "Log as Error with bool value    : %T" CR                      , boolValue1);
+//    Log.fatal    (  "Log as Fatal with bool value    : %T" CR                      , boolValue1);
+//    Log.verbose  (F("Log as Verbose with bool value   : %T" CR CR CR               ), boolValue2);

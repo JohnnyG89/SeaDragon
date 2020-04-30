@@ -1,0 +1,523 @@
+{
+  "title": "SeaDragon",
+  "configuration": {
+    "description": "Aquarium Home",
+    "widgets": {
+      "2685037a-6214-27cf-62ec-b9f4f759f614": {
+        "isSystemType": true,
+        "bundleAlias": "charts",
+        "typeAlias": "basic_timeseries",
+        "type": "timeseries",
+        "title": "New widget",
+        "sizeX": 15,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "iAnalogInput_Filtered",
+                  "type": "timeseries",
+                  "label": "iAnalogInput_Filtered",
+                  "color": "#2196f3",
+                  "settings": {
+                    "excludeFromStacking": false,
+                    "hideDataByDefault": false,
+                    "disableDataHiding": false,
+                    "removeFromLegend": false,
+                    "showLines": true,
+                    "fillLines": false,
+                    "showPoints": false,
+                    "showPointShape": "circle",
+                    "pointShapeFormatter": "var size = radius * Math.sqrt(Math.PI) / 2;\nctx.moveTo(x - size, y - size);\nctx.lineTo(x + size, y + size);\nctx.moveTo(x - size, y + size);\nctx.lineTo(x + size, y - size);",
+                    "showPointsLineWidth": 5,
+                    "showPointsRadius": 3,
+                    "tooltipValueFormatter": "",
+                    "showSeparateAxis": false,
+                    "axisTitle": "",
+                    "axisPosition": "left",
+                    "axisTicksFormatter": "",
+                    "comparisonSettings": {
+                      "showValuesForComparison": true,
+                      "comparisonValuesLabel": "",
+                      "color": ""
+                    }
+                  },
+                  "_hash": 0.7467547760009674
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            },
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "ipH",
+                  "type": "timeseries",
+                  "label": "ipH",
+                  "color": "#4caf50",
+                  "settings": {
+                    "excludeFromStacking": false,
+                    "hideDataByDefault": false,
+                    "disableDataHiding": false,
+                    "removeFromLegend": false,
+                    "showLines": true,
+                    "fillLines": false,
+                    "showPoints": false,
+                    "showPointShape": "circle",
+                    "pointShapeFormatter": "var size = radius * Math.sqrt(Math.PI) / 2;\nctx.moveTo(x - size, y - size);\nctx.lineTo(x + size, y + size);\nctx.moveTo(x - size, y + size);\nctx.lineTo(x + size, y - size);",
+                    "showPointsLineWidth": 5,
+                    "showPointsRadius": 3,
+                    "tooltipValueFormatter": "",
+                    "showSeparateAxis": false,
+                    "axisTitle": "",
+                    "axisPosition": "left",
+                    "axisTicksFormatter": "",
+                    "comparisonSettings": {
+                      "showValuesForComparison": true,
+                      "comparisonValuesLabel": "",
+                      "color": ""
+                    }
+                  },
+                  "_hash": 0.724657945516066
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "interval": 10000,
+              "timewindowMs": 120000
+            },
+            "aggregation": {
+              "type": "AVG",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "shadowSize": 4,
+            "fontColor": "#545454",
+            "fontSize": 10,
+            "xaxis": {
+              "showLabels": false,
+              "color": "#545454"
+            },
+            "yaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "grid": {
+              "color": "#545454",
+              "tickColor": "#DDDDDD",
+              "verticalLines": true,
+              "horizontalLines": true,
+              "outlineWidth": 1
+            },
+            "stack": true,
+            "tooltipIndividual": false,
+            "timeForComparison": "months",
+            "xaxisSecond": {
+              "axisPosition": "top",
+              "showLabels": true
+            },
+            "smoothLines": true
+          },
+          "title": "New Timeseries - Flot",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "mobileHeight": null,
+          "showTitleIcon": false,
+          "titleIcon": null,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {},
+          "useDashboardTimewindow": true,
+          "displayTimewindow": true,
+          "showLegend": true,
+          "actions": {}
+        },
+        "id": "2685037a-6214-27cf-62ec-b9f4f759f614"
+      },
+      "9ff00950-3f12-2db1-2db4-02991cfb2ea4": {
+        "isSystemType": true,
+        "bundleAlias": "analogue_gauges",
+        "typeAlias": "radial_gauge_canvas_gauges",
+        "type": "latest",
+        "title": "New widget",
+        "sizeX": 6,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "iTemperature",
+                  "type": "timeseries",
+                  "label": "iTemperature",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.07097640865488275
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "startAngle": 45,
+            "ticksAngle": 270,
+            "showBorder": true,
+            "defaultColor": "#e65100",
+            "needleCircleSize": 10,
+            "highlights": [],
+            "showUnitTitle": true,
+            "colorPlate": "#fff",
+            "colorMajorTicks": "#444",
+            "colorMinorTicks": "#666",
+            "minorTicks": 10,
+            "valueInt": 3,
+            "highlightsWidth": 15,
+            "valueBox": true,
+            "animation": true,
+            "animationDuration": 500,
+            "animationRule": "cycle",
+            "colorNeedleShadowUp": "rgba(2, 255, 255, 0)",
+            "numbersFont": {
+              "family": "Roboto",
+              "size": 18,
+              "style": "normal",
+              "weight": "500",
+              "color": "#616161"
+            },
+            "titleFont": {
+              "family": "Roboto",
+              "size": 24,
+              "style": "normal",
+              "weight": "500",
+              "color": "#888"
+            },
+            "unitsFont": {
+              "family": "Roboto",
+              "size": 22,
+              "style": "normal",
+              "weight": "500",
+              "color": "#616161"
+            },
+            "valueFont": {
+              "family": "Segment7Standard",
+              "size": 36,
+              "style": "normal",
+              "weight": "normal",
+              "shadowColor": "rgba(0, 0, 0, 0.49)",
+              "color": "#444"
+            },
+            "minValue": 65,
+            "colorNeedleShadowDown": "rgba(188,143,143,0.45)",
+            "colorValueBoxRect": "#888",
+            "colorValueBoxRectEnd": "#666",
+            "colorValueBoxBackground": "#babab2",
+            "colorValueBoxShadow": "rgba(0,0,0,1)",
+            "maxValue": 85
+          },
+          "title": "New Radial gauge - Canvas Gauges",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showTitleIcon": false,
+          "titleIcon": null,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {},
+          "useDashboardTimewindow": true,
+          "displayTimewindow": true,
+          "showLegend": false,
+          "actions": {}
+        },
+        "id": "9ff00950-3f12-2db1-2db4-02991cfb2ea4"
+      },
+      "7aba6b4a-7d9b-8485-fd69-c824ce6c7529": {
+        "isSystemType": true,
+        "bundleAlias": "digital_gauges",
+        "typeAlias": "simple_neon_gauge_justgage",
+        "type": "latest",
+        "title": "New widget",
+        "sizeX": 6,
+        "sizeY": 4,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "ipH",
+                  "type": "timeseries",
+                  "label": "ipH",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.7160715486453346
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#000000",
+          "color": "rgba(255, 254, 254, 0.87)",
+          "padding": "0px",
+          "settings": {
+            "maxValue": 100,
+            "minValue": 0,
+            "donutStartAngle": 90,
+            "showValue": true,
+            "showMinMax": true,
+            "gaugeWidthScale": 1,
+            "levelColors": [],
+            "titleFont": {
+              "family": "Roboto",
+              "size": 12,
+              "style": "normal",
+              "weight": "500"
+            },
+            "labelFont": {
+              "family": "Roboto",
+              "size": 8,
+              "style": "normal",
+              "weight": "500"
+            },
+            "valueFont": {
+              "family": "Segment7Standard",
+              "style": "normal",
+              "weight": "500",
+              "size": 32
+            },
+            "minMaxFont": {
+              "family": "Segment7Standard",
+              "size": 12,
+              "style": "normal",
+              "weight": "500"
+            },
+            "neonGlowBrightness": 40,
+            "dashThickness": 1.5,
+            "gaugeType": "donut",
+            "animation": true,
+            "animationDuration": 500,
+            "animationRule": "linear",
+            "timestampFormat": "yyyy-MM-dd HH:mm:ss"
+          },
+          "title": "New Simple neon gauge - justGage",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "widgetStyle": {},
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "actions": {},
+          "showTitleIcon": false,
+          "titleIcon": null,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "displayTimewindow": true
+        },
+        "id": "7aba6b4a-7d9b-8485-fd69-c824ce6c7529"
+      },
+      "28525636-7b3c-226e-14e9-b38d5ab8a6e1": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "attributes_card",
+        "type": "latest",
+        "title": "New widget",
+        "sizeX": 8,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "iSensor_CabinetDoor",
+                  "type": "timeseries",
+                  "label": "iSensor_CabinetDoor",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.13423787371322327
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            },
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "iSwitch_PLC",
+                  "type": "timeseries",
+                  "label": "iSwitch_PLC",
+                  "color": "#4caf50",
+                  "settings": {},
+                  "_hash": 0.6837450454416099
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            },
+            {
+              "type": "entity",
+              "dataKeys": [
+                {
+                  "name": "oLight_Cabinet",
+                  "type": "timeseries",
+                  "label": "oLight_Cabinet",
+                  "color": "#f44336",
+                  "settings": {},
+                  "_hash": 0.5105614446008866
+                }
+              ],
+              "entityAliasId": "ce4907be-b30a-e89a-4b7f-895678615642"
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {},
+          "title": "New Attributes card",
+          "showTitleIcon": false,
+          "titleIcon": null,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": true,
+          "displayTimewindow": true,
+          "showLegend": false,
+          "actions": {}
+        },
+        "id": "28525636-7b3c-226e-14e9-b38d5ab8a6e1"
+      }
+    },
+    "states": {
+      "default": {
+        "name": "SeaDragon",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "2685037a-6214-27cf-62ec-b9f4f759f614": {
+                "sizeX": 15,
+                "sizeY": 5,
+                "mobileHeight": null,
+                "row": 5,
+                "col": 1
+              },
+              "9ff00950-3f12-2db1-2db4-02991cfb2ea4": {
+                "sizeX": 6,
+                "sizeY": 5,
+                "row": 0,
+                "col": 1
+              },
+              "7aba6b4a-7d9b-8485-fd69-c824ce6c7529": {
+                "sizeX": 6,
+                "sizeY": 4,
+                "row": 1,
+                "col": 16
+              },
+              "28525636-7b3c-226e-14e9-b38d5ab8a6e1": {
+                "sizeX": 8,
+                "sizeY": 5,
+                "row": 0,
+                "col": 7
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "color": "rgba(0,0,0,0.870588)",
+              "columns": 24,
+              "margins": [
+                10,
+                10
+              ],
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "ce4907be-b30a-e89a-4b7f-895678615642": {
+        "id": "ce4907be-b30a-e89a-4b7f-895678615642",
+        "alias": "Entity1",
+        "filter": {
+          "type": "deviceType",
+          "resolveMultiple": true,
+          "deviceType": "Arduino",
+          "deviceNameFilter": "P1AM"
+        }
+      }
+    },
+    "timewindow": {
+      "realtime": {
+        "interval": 10000,
+        "timewindowMs": 300000
+      },
+      "aggregation": {
+        "type": "AVG",
+        "limit": 25000
+      },
+      "hideInterval": false,
+      "hideAggregation": false,
+      "hideAggInterval": false
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+  },
+  "name": "SeaDragon"
+}

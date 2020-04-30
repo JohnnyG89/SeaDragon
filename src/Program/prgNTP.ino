@@ -6,51 +6,50 @@
 //
 //                                                          Reef On
 #include "Global_Includes.h"
-
 const unsigned int NTPPort = 8888;
 const char TimeServer[] = "time.nist.gov";
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 
 void initNTP(void) {
+  Log.trace("NTP:: Beginning RTC Initialization");
 
-  if(!_ENABLE_NTP){
-    prglog("NTP::NTP Disabled");
-    tskNTP.disable();
+  if (!_ENABLE_NTP) {
+    Log.warning("NTP::NTP Disabled");
+    Scheduler::currentScheduler().currentTask().disable();
     return;
   }
-  
-  prglog("NTP::Beginning RTC Initialization");
 
   rtc.begin();
 
   if (_ENABLE_COMMS) {
-    prglog("NTP::Comms enabled, beginning clock sync procedure");
+    Log.notice("NTP:: Comms enabled, beginning clock sync procedure");
     if (rtc.getEpoch() > 1585302206) {
-      prglog("NTP::Time already set, not enabling NTP");
+      Log.notice("NTP:: Time already set, not enabling NTP");
     } else {
-      prglog("NTP::Time not set, enabling NTP");
-    } 
+      Log.notice("NTP:: Time not set, enabling NTP");
+    }
     PrintTime();
   } else {
-    prglog("NTP::Comms disabled, Not syncing RTC");
+    Log.notice("NTP::Comms disabled, Not syncing RTC");
   }
   Udp.begin(NTPPort);
-  tskNTP.setCallback(&cyclicNTP);
 
-  prglog("NTP::Finished RTC Initialization");
+  Scheduler::currentScheduler().currentTask().setCallback(&cyclicNTP);
+
+  Log.trace("NTP:: Finished RTC Initialization");
 }
 
 void cyclicNTP(void) {
   logTaskTimer("NTP");
-//  prglog("In the NTP Task?");
-//  return;
+  //  prglog("In the NTP Task?");
+  //  return;
   if (!gTimeSet && _ENABLE_COMMS) { //Don't send the NTP Packet if we've already set the time (TODO: Find a better way to set the time!)
-    prglog("NTP::Sending NTP Packet...");
+    Log.notice("NTP:: Sending NTP Packet...");
     sendNTPpacket(TimeServer); //Send the NTP packet to NIST.
-    prglog("Sent NTP Packet...");
+    Log.notice("NTP:: Sent NTP Packet...");
     if (Udp.parsePacket()) {// We've received a packet, read the data from it
-      prglog("NTP::Rec'd UDP Packet");
+      Log.notice("NTP:: Rec'd UDP Packet");
       gTimeSet = true; //Mark that we've already set the time!
       Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
       unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);// the timestamp starts at byte 40 of the received packet and is four bytes,
@@ -58,13 +57,12 @@ void cyclicNTP(void) {
       // combine the four bytes (two words) into a long integer
       // this is NTP time (seconds since Jan 1 1900):
       unsigned long secsSince1900 = highWord << 16 | lowWord;
-      prglog(String("NTP::Seconds since Jan 1 1900 = " + String(secsSince1900)).c_str());
+      Log.verbose("NTP:: Seconds since Jan 1 1900 = %d ::", secsSince1900);
       unsigned long epoch = secsSince1900 - seventyYears + TimeZone * 3600;
-      // print Unix time:
-      prglog(String("Unix time = " + String(epoch)).c_str());
+      Log.verbose("Unix time = " );
       rtc.setEpoch(epoch); //TODO: get system clock epoch set function
       PrintTime();
-      tskNTP.disable();
+      Scheduler::currentScheduler().currentTask().disable();
     }
   }
 }
@@ -92,5 +90,5 @@ void sendNTPpacket(const char * address) {
 }
 
 void PrintTime(void) { //TODO: Print Time!
-  prglog(String("Time: " + String(rtc.getMonth()) + "/" + String(rtc.getDay()) + "/" + String(rtc.getYear()) + "-" + String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds())).c_str());
+//  Log.verbose(String("Time: " + String(rtc.getMonth()) + "/" + String(rtc.getDay()) + "/" + String(rtc.getYear()) + "-" + String(rtc.getHours()) + ":" + String(rtc.getMinutes()) + ":" + String(rtc.getSeconds())).c_str());
 }

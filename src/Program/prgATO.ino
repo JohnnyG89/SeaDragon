@@ -7,38 +7,19 @@
 //                                                          Reef On
 #include "Global_Includes.h"
 
-
-
-TON tmrMaxATOOnTime(10000);
-bool oLEDBuffer[1000];
-
-//Scheduler &s = Scheduler::currentScheduler();
-//  Task &t = s.currentTask();
-
 void initATO(void) {
-  Task &t = Scheduler::currentScheduler().currentTask();
-  
+  Log.trace("ATO:: Initializing ATO...");
   if (!_ENABLE_ATO) {
-    prglog("Disabling ATO Task...");
-    t.disable();
+    Log.warning("ATO:: Disabling ATO Task...");
+    Scheduler::currentScheduler().currentTask().disable();
     return;
   }
-
-  prglog("Initializing ATO...");
-  t.setCallback(&cyclicATO);
-  prglog("Initialized ATO");
+  Scheduler::currentScheduler().currentTask().setCallback(&cyclicATO);
+  Log.trace("ATO:: Initialized ATO");
 }
 
 void cyclicATO(void) {
   logTaskTimer("ATO");
-
-  Scheduler &s = Scheduler::currentScheduler();
-  Task &pTask = s.currentTask();
-  
-  oLEDIndicator = pTask.getRunCounter()%2==0;
-
-//  //If all 3 sensors are out of water, turn on the ATO
-//  if (!inWaterLevelSensor_1 && !inWaterLevelSensor_2 && !inWaterLevelSensor_3 && !tmrMaxATOOnTime.Q) {
-//
-//  }
+  Log.notice("ATO:: Disabling Task ::");
+  Scheduler::currentScheduler().currentTask().disable();
 }

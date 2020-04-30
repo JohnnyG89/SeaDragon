@@ -58,7 +58,7 @@ Task tskProbeMonitor(       200,      TASK_FOREVER,    &initProbeMonitor,      &
 //ThingsBoard - Connect with the ThingsBoard platform
 void initThingsBoard();
 void cyclicThingsBoard();
-Task tskThingsBoard(        2500,   TASK_FOREVER,    &initThingsBoard,      &ts_low,   true);
+Task tskThingsBoard(        2000,   TASK_FOREVER,    &initThingsBoard,      &ts_low,   true);
 
 //NTP - Manage sync'ing the system time
 //with the NIST time server
@@ -71,25 +71,65 @@ void initStorageManager();
 void cyclicStorageManager();
 Task tskStorageManager(     100,   TASK_FOREVER,    &initStorageManager,    &ts_low,  true);
 
+// Available levels are:
+// LOG_LEVEL_SILENT, LOG_LEVEL_FATAL, LOG_LEVEL_ERROR, LOG_LEVEL_WARNING, LOG_LEVEL_NOTICE, LOG_LEVEL_TRACE, LOG_LEVEL_VERBOSE
+
 //Execution
 void setup() {
   Serial.begin(115200);               //Initialize serial communication at 0.5M bits per second
-  while (!Serial) {}                  //Wait for Serial Port to be opened
-  prglog("Initialized Serial Communications");
-//  prglog("Starting Task Timers");
-  //TODO: Test, not 100% sure how this works w/ multiple task timers
-  //TODO: Call ts.init()?
-  ts_high.startNow();
-  ts_low.startNow();
+  while (!Serial && !Serial.available()) {}                  //Wait for Serial Port to be opened
+  Log.begin(LOG_LEVEL_VERBOSE, &Serial);
+  Log.setSuffix(printNewline);
+  Log.notice("Initialized Serial Communications");
 
-//  prglog("Setting High Priority Scheduler...");
+  ts_low.startNow();
   ts_low.setHighPriorityScheduler(&ts_high);
 }
 
 void loop() {
   ts_low.execute();
-//  logScheduler(&ts_low);
+  //  logScheduler(&ts_low);
 }
+
+void printNewline(Print* _logOutput) {
+  _logOutput->print('\n');
+}
+
+/**
+ * Logging is a helper class to output informations over
+ * RS232. If you know log4j or log4net, this logging class
+ * is more or less similar ;-) <br>
+ * Different loglevels can be used to extend or reduce output
+ * All methods are able to handle any number of output parameters.
+ * All methods print out a formated string (like printf).<br>
+ * To reduce output and program size, reduce loglevel.
+ * 
+ * Output format string can contain below wildcards. Every wildcard
+ * must be start with percent sign (\%)
+ * 
+ * ---- Wildcards
+ * 
+ * %s  replace with an string (char*)
+ * %c replace with an character
+ * %d replace with an integer value
+ * %l replace with an long value
+ * %x replace and convert integer value into hex
+ * %X like %x but combine with 0x123AB
+ * %b replace and convert integer value into binary
+ * %B like %x but combine with 0b10100011
+ * %t replace and convert boolean value into "t" or "f"
+ * %T like %t but convert into "true" or "false"
+ * 
+ * ---- Loglevels
+ * 
+ * 0 - LOG_LEVEL_SILENT     no output
+ * 1 - LOG_LEVEL_FATAL      fatal errors
+ * 2 - LOG_LEVEL_ERROR      all errors
+ * 3 - LOG_LEVEL_WARNING    errors and warnings
+ * 4 - LOG_LEVEL_NOTICE     errors, warnings and notices
+ * 5 - LOG_LEVEL_TRACE      errors, warnings, notices, traces
+ * 6 - LOG_LEVEL_VERBOSE    all
+ */
 
 //GENERAL TODO:
 //CNC-like plotter for feeding corals lol
@@ -101,17 +141,5 @@ void loop() {
 //Scheduler &s = Scheduler::currentScheduler();
 //  Task &t = s.currentTask();
 //libs
-//AD_Sensors
-//Adafruit ZeroTimer Library
-//ArduinoLog
-//dbg-trace
-//Debug
-//ESP Logger
-//JsonLogger
-//Log
-//Logger
-//M2M Solutions Logger Library
-//Unified Log
-//Arduino_DebugUtils
 //Scheduler
 //Difference in cooperative and collaborative task schedulers?

@@ -8,27 +8,27 @@
 #include "Global_Includes.h"
 
 void initWatchdog(void) {
-  prglog("Initializing Watchdog...");
+  Log.trace("Watchdog:: Initializing Watchdog...");
 
   if (_ENABLE_WATCHDOG) {
-    prglog("Enabling Watchdog Timer");
+    Log.notice("Watchdog:: Enabling Watchdog Timer");
     P1.configWD(10000, HOLD);
     P1.startWD();
   } else {
-    prglog("Not Enabling Watchdog Timer");
+    Log.warning("Watchdog:: Not Enabling Watchdog Timer");
   }
-
-  tskWatchdog.setCallback(&cyclicWatchdog);
-  prglog("Initialized Watchdog.");
+  
+  Scheduler::currentScheduler().currentTask().setCallback(&cyclicWatchdog);
+  Log.trace("Watchdog:: Initialized Watchdog.");
 }
 
 void cyclicWatchdog(void) {
   logTaskTimer("Watchdog");
 
   if (_ENABLE_WATCHDOG) {
-    //    prglog("Petting Watchdog...");
+    Log.verbose("Watchdog:: Pet Watchdog");
     P1.petWD();
   } else {
-    tskWatchdog.disable();
+    Scheduler::currentScheduler().currentTask().disable();
   }
 }
