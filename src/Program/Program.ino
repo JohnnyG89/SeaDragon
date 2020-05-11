@@ -8,138 +8,95 @@
 #include "Global_Includes.h"
 
 ////Task Declarations
-//StatusRequest measure;
 Scheduler ts_high, ts_low;
-
 //
 //High Priority (machine control) tasks
 //
-
 //Watchdog Task
 void initWatchdog();
-void cyclicWatchdog();
-Task tskWatchdog(           5000,     TASK_FOREVER,       &initWatchdog,         &ts_high,   true);
+Task tskWatchdog(	WATCHDOG_TIMEOUT / 2, TASK_FOREVER,     	&initWatchdog,         			&ts_high,   true);
 
-//Hardware Manager - Initialization of P1AM IO modules
+//Hardware Manager - Initialization of P1AM IO modules, cyclic IO Read/Write, Power removal handling
 void initHardwareManager();
-void cyclicHardwareManager();
-Task tskHardwareManager(    200,      TASK_FOREVER,      &initHardwareManager,  &ts_high,   true);
+Task tskHardwareManager(		100,      	TASK_FOREVER,     	&initHardwareManager,  			&ts_high,   true);
 
 //Comm Manager - Manage the ethernet connections for the various other programs that rely on it
 void initCommManager();
-void cyclicCommManager();
-Task tskCommManager(        500,      TASK_FOREVER,      &initCommManager,      &ts_high,   true);
+Task tskCommManager(   			500,      	TASK_FOREVER,     	&initCommManager,      			&ts_high,   true);
 
 //ATO:  Auto top-off system
 void initATO();
-void cyclicATO();
-Task tskATO(                200,      TASK_FOREVER,    &initATO,              &ts_high,   true);
+Task tskATO(           			100,      	TASK_FOREVER,    	&initATO,              			&ts_high,   true);
 
-//TODO: If you're going to use Chronos, it's incompatible with RTCZero
-////Alarms: Warnings, Faults, Messages that require operator attention
+//AutoFeeders
+void initAutoFeeders();
+Task tskAutoFeeders(       		100,      	TASK_FOREVER,    	&initAutoFeeders,           	&ts_high,   true);
+
+//DosePumps
+void initDosePumps();
+Task tskDosePumps(       		100,      	TASK_FOREVER,    	&initDosePumps,            		&ts_high,   true);
+
+//Lights
+void initLights();
+Task tskLights(       			100,      	TASK_FOREVER,    	&initLights,            		&ts_high,   true);
+
+////Alarms: Warnings, Faults, Messages that require operator attention, Scheduling of AutoFeeders, dosepumps, etc.
 void initAlarms();
-void cyclicAlarms();
-Task tskAlarms(             500,      TASK_FOREVER,    &initAlarms,            &ts_high,   true);
+Task tskAlarms(             	100,      	TASK_FOREVER,    	&initAlarms,            		&ts_high,   true);
 
-//Alarms: Warnings, Faults, Messages that require operator attention
+//Power Equipment - Pumps, Powerheads, Wavemakers, etc.
+void initPowerEquipment();
+Task tskPowerEquipment(         100,      	TASK_FOREVER,    	&initPowerEquipment,        	&ts_high,   true);
+
+//ProbeMonitor - Manage the calculations, filtering, scaling of the various analog probes
 void initProbeMonitor();
-void cyclicProbeMonitor();
-Task tskProbeMonitor(       200,      TASK_FOREVER,    &initProbeMonitor,      &ts_high,   true);
+Task tskProbeMonitor(       	250,      	TASK_FOREVER,    	&initProbeMonitor,      		&ts_high,   true);
 
 //
-//Low Priority tasks
+//Low-Priority Tasks
 //
-//
-////MQTT - Manage all of the MQTT handshaking, ethernet connectivity, etc.
-//void initMQTT();
-//void cyclicMQTT();
-//Task tskMQTT(               LOW_PRIORITY_CYCLE_TIME,   TASK_FOREVER,    &initMQTT,             &ts_low,   true);
+//ThingsBoard_Telemetry - Connect with the ThingsBoard platform and sample onboard data for logging
+void initThingsBoard_Telemetry();
+Task tskThingsBoard_Telemetry(	100,        TASK_FOREVER,    	&initThingsBoard_Telemetry,		&ts_low,   	true);
 
-//ThingsBoard - Connect with the ThingsBoard platform
-void initThingsBoard();
-void cyclicThingsBoard();
-Task tskThingsBoard(        2000,   TASK_FOREVER,    &initThingsBoard,      &ts_low,   true);
+//ThingsBoard_RPC - Connect with the ThingsBoard platform and manage RPC callbacks
+void initThingsBoard_RPC();
+Task tskThingsBoard_RPC(     	25,   		TASK_FOREVER,    	&initThingsBoard_RPC,      		&ts_low,   	true);
 
 //NTP - Manage sync'ing the system time
 //with the NIST time server
 void initNTP();
-void cyclicNTP();
-Task tskNTP(                50,   TASK_FOREVER,    &initNTP,              &ts_low,   true);
+Task tskNTP(                	50,   		TASK_FOREVER,    	&initNTP,             			&ts_low,   	true);
 
-//Storage Manager - Manage the SD card
+//Storage Manager - Manage the SD card, logging, scheduler functions
 void initStorageManager();
-void cyclicStorageManager();
-Task tskStorageManager(     100,   TASK_FOREVER,    &initStorageManager,    &ts_low,  true);
-
-// Available levels are:
-// LOG_LEVEL_SILENT, LOG_LEVEL_FATAL, LOG_LEVEL_ERROR, LOG_LEVEL_WARNING, LOG_LEVEL_NOTICE, LOG_LEVEL_TRACE, LOG_LEVEL_VERBOSE
+Task tskStorageManager(     	100,   		TASK_FOREVER,    	&initStorageManager,  			&ts_low,  	true);
 
 //Execution
 void setup() {
-  Serial.begin(115200);               //Initialize serial communication at 0.5M bits per second
-  while (!Serial && !Serial.available()) {}                  //Wait for Serial Port to be opened
-  Log.begin(LOG_LEVEL_VERBOSE, &Serial);
-  Log.setSuffix(printNewline);
-  Log.notice("Initialized Serial Communications");
+  Serial.begin(115200);               			//Initialize serial communication
+  while (!Serial && !Serial.available()) {}   //Wait for Serial Port to be opened and comm. active (use one or the other)
+//  while (!Serial) {}                  			//Wait for Serial Port to be opened (use one or the other)
+  Log.begin			(LOG_LEVEL_VERBOSE, &Serial);
+  Log.setPrefix		(printTimestamp);
+  Log.setSuffix		(printNewline);
+  Log.notice		("Initialized Serial Communications");
 
-  ts_low.startNow();
   ts_low.setHighPriorityScheduler(&ts_high);
 }
 
 void loop() {
   ts_low.execute();
-  //  logScheduler(&ts_low);
+  logScheduler(&ts_low);
+  logScheduler(&ts_high);
 }
 
 void printNewline(Print* _logOutput) {
   _logOutput->print('\n');
 }
 
-/**
- * Logging is a helper class to output informations over
- * RS232. If you know log4j or log4net, this logging class
- * is more or less similar ;-) <br>
- * Different loglevels can be used to extend or reduce output
- * All methods are able to handle any number of output parameters.
- * All methods print out a formated string (like printf).<br>
- * To reduce output and program size, reduce loglevel.
- * 
- * Output format string can contain below wildcards. Every wildcard
- * must be start with percent sign (\%)
- * 
- * ---- Wildcards
- * 
- * %s  replace with an string (char*)
- * %c replace with an character
- * %d replace with an integer value
- * %l replace with an long value
- * %x replace and convert integer value into hex
- * %X like %x but combine with 0x123AB
- * %b replace and convert integer value into binary
- * %B like %x but combine with 0b10100011
- * %t replace and convert boolean value into "t" or "f"
- * %T like %t but convert into "true" or "false"
- * 
- * ---- Loglevels
- * 
- * 0 - LOG_LEVEL_SILENT     no output
- * 1 - LOG_LEVEL_FATAL      fatal errors
- * 2 - LOG_LEVEL_ERROR      all errors
- * 3 - LOG_LEVEL_WARNING    errors and warnings
- * 4 - LOG_LEVEL_NOTICE     errors, warnings and notices
- * 5 - LOG_LEVEL_TRACE      errors, warnings, notices, traces
- * 6 - LOG_LEVEL_VERBOSE    all
- */
-
-//GENERAL TODO:
-//CNC-like plotter for feeding corals lol
-//Status Indication on the front LED
-//Ring-buffer
-//switches may need debouncing
-//blinking pattern of the lights
-//ArduinoUnit unittesting library
-//Scheduler &s = Scheduler::currentScheduler();
-//  Task &t = s.currentTask();
-//libs
-//Scheduler
-//Difference in cooperative and collaborative task schedulers?
+void printTimestamp(Print* _logOutput) {
+  char c[12];
+  int m = sprintf(c, "%10lu ", millis());
+  _logOutput->print(c);
+}

@@ -7,26 +7,33 @@
 //                                                          Reef On
 #include "Global_Includes.h"
 
+static Logging wdgLog;
+
 void initWatchdog(void) {
-  Log.trace("Watchdog:: Initializing Watchdog...");
+  wdgLog.begin(LOG_LEVEL_NOTICE, &Serial);
+  wdgLog.setPrefix(printTimestamp);
+  wdgLog.setSuffix(printNewline);
+  wdgLog.notice("Watchdog:: Initialized Watchdog Log ::");
+
+  wdgLog.trace("Watchdog:: Initializing Watchdog...");
 
   if (_ENABLE_WATCHDOG) {
-    Log.notice("Watchdog:: Enabling Watchdog Timer");
-    P1.configWD(10000, HOLD);
+    wdgLog.notice("Watchdog:: Enabling Watchdog Timer");
+    P1.configWD(WATCHDOG_TIMEOUT, HOLD);
     P1.startWD();
   } else {
-    Log.warning("Watchdog:: Not Enabling Watchdog Timer");
+    wdgLog.warning("Watchdog:: Not Enabling Watchdog Timer");
   }
-  
+
   Scheduler::currentScheduler().currentTask().setCallback(&cyclicWatchdog);
-  Log.trace("Watchdog:: Initialized Watchdog.");
+  wdgLog.trace("Watchdog:: Initialized Watchdog.");
 }
 
 void cyclicWatchdog(void) {
-  logTaskTimer("Watchdog");
+  logTaskTimer("Watchdog", &Scheduler::currentScheduler().currentTask());
 
   if (_ENABLE_WATCHDOG) {
-    Log.verbose("Watchdog:: Pet Watchdog");
+    wdgLog.verbose("Watchdog:: Pet Watchdog");
     P1.petWD();
   } else {
     Scheduler::currentScheduler().currentTask().disable();

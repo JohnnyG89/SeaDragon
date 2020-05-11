@@ -5,7 +5,6 @@
 //  ....''             |___________ .'           `. |......'  |      `.   .'           `.  `-._____.'|  `.______.'  |          ``|
 //
 //                                                          Reef On
-
 //Hello: If you are reading this, then congratulations!  Don't forget to enjoy your tank!
 
 //Global Includes
@@ -13,22 +12,22 @@
 #define _GLOBAL_INCLUDES_H
 
 //User Program pre-compiler flags
-#define _DEBUG                true
-#define _ENABLE_WATCHDOG      true
-#define _ENABLE_COMMS         true
-#define _DUMP_TO_SD           true
-#define LOG_FILE_NAME         "Log.txt"
-#define _DEBUG_VERBOSE        false
-#define _LOG_MQTT             true
-#define _REQUIRE_HARDWARE     true
-#define _ENABLE_ATO           true
-#define _ENABLE_ALARMS        false
-#define _ENABLE_NTP           true
+#define _DEBUG                    true
+#define _ENABLE_WATCHDOG          true
+#define _ENABLE_COMMS             true
+#define _DUMP_TO_SD               true
+#define LOG_FILE_NAME             "Log.txt"
+#define _REQUIRE_HARDWARE         true
+#define _ENABLE_ATO               true
+#define _ENABLE_ALARMS            true
+#define _ENABLE_NTP               true
+#define WATCHDOG_TIMEOUT	      5000
+#define TASK_REPORT_INTERVAL      50
 
 //TaskScheduler Compiler Flags
 #define _TASK_TIMECRITICAL          // Enable monitoring scheduling overruns
 #define _TASK_SLEEP_ON_IDLE_RUN     // Enable 1 ms SLEEP_IDLE powerdowns between runs if no callback methods were invoked during the pass
-#define _TASK_STATUS_REQUEST        // Compile with support for StatusRequest functionality - triggering tasks on status change events in addition to time only
+//#define _TASK_STATUS_REQUEST        // Compile with support for StatusRequest functionality - triggering tasks on status change events in addition to time only
 #define _TASK_WDT_IDS             // Compile with support for wdt control points and task ids
 #define _TASK_LTS_POINTER           // Compile with support for local task storage pointer
 #define _TASK_PRIORITY              // Support for layered scheduling priority
@@ -44,65 +43,34 @@
 #define TimeZone -4
 #define seventyYears  2208988800UL
 
+#include <Time.h>
+#include <TimeLib.h>
+#include <Chronos.h>
 #include <ThingsBoard.h>
 #include <SD.h>
 #include <P1AM.h>
-//#include <plclib.h>
+#include <plclib.h>
 #include <TaskSchedulerSleepMethods.h>
 #include <TaskSchedulerDeclarations.h>
 #include <TaskScheduler.h>
-#include <RTCZero.h>
 #include <Ethernet.h>
 #include <Smoothed.h>
 #include <curveFitting.h>
-#include <CronAlarms.h>
 #include <ArduinoLog.h>
+#include <StreamLib.h>
 
-EthernetClient client;
-ThingsBoard tb(client);
-RTCZero rtc;
-EthernetUDP Udp;
+#include "Alarms.h"
+#include "IO.h"
+
+EthernetClient  client;
+ThingsBoard     tb(client);
+EthernetUDP     Udp;
 
 
-bool gTimeSet = false, gEthernetConnectionActive = false;
 
-////IO Buffer
-//uint32_t outDiscreteDataBuffer;
-//uint32_t outRelayDataBuffer;
-//uint32_t inDiscreteDataBuffer;
+bool            gTimeSet                    = false;
+bool            gEthernetConnectionActive   = false;
+bool            tmpDashboardIndicator       = false;
+uint32_t		gFaultWord						= 0;
 
-//IO Bits - On the PLC itself
-bool iSwitchState;
-bool oLEDIndicator;
-bool iCabinetDoorSensor;
-bool oCabinetLight;
-bool oFreshwaterLightOutput;
-int iAnalogValue = -1;
-float smoothedSensorValueAvg;
-double ipHSensorReading;
-float iTemperature;
 #endif
-
-//
-//    Log.notice   (  "Log as Info with integer values : %d, %d" CR                  , intValue1,  intValue2);
-//    Log.notice   (F("Log as Info with hex values     : %x, %X" CR                 ), intValue1,  intValue1);
-//    Log.notice   (  "Log as Info with hex values     : %x, %X" CR                  , intValue2,  intValue2);
-//    Log.notice   (F("Log as Info with binary values  : %b, %B" CR                 ), intValue1,  intValue1);
-//    Log.notice   (  "Log as Info with binary values  : %b, %B" CR                  , intValue2,  intValue2);
-//    Log.notice   (F("Log as Info with long values    : %l, %l" CR                 ), longValue1, longValue2);
-//    Log.notice   (  "Log as Info with bool values    : %t, %T" CR                  , boolValue1, boolValue2);
-//    Log.notice   (F("Log as Info with string value   : %s" CR                     ), charArray);
-//    Log.notice   (  "Log as Info with Flash string value   : %S" CR                , flashCharArray1);
-//    Log.notice   (  "Log as Info with Flash string value   : %S" CR                , flashCharArray2);
-//    Log.notice   (  "Log as Info with string value   : %s" CR                      , stringValue1.c_str());
-//    Log.notice   (F("Log as Info with float value   : %F" CR                      ), floatValue);
-//    Log.notice   (  "Log as Info with float value   : %F" CR                       , floatValue);
-//    Log.notice   (F("Log as Info with double value   : %D" CR                     ), doubleValue);
-//    Log.notice   (  "Log as Info with double value   : %D" CR                      , doubleValue);
-//    Log.notice   (F("Log as Debug with mixed values  : %d, %d, %l, %l, %t, %T" CR ), intValue1 , intValue2,
-//                longValue1, longValue2, boolValue1, boolValue2);
-//    Log.trace    (  "Log as Trace with bool value    : %T" CR                      , boolValue1);
-//    Log.warning  (  "Log as Warning with bool value  : %T" CR                      , boolValue1);
-//    Log.error    (  "Log as Error with bool value    : %T" CR                      , boolValue1);
-//    Log.fatal    (  "Log as Fatal with bool value    : %T" CR                      , boolValue1);
-//    Log.verbose  (F("Log as Verbose with bool value   : %T" CR CR CR               ), boolValue2);
