@@ -19,7 +19,7 @@ void initWatchdog(void) {
 
   if (_ENABLE_WATCHDOG) {
     wdgLog.notice("Watchdog:: Enabling Watchdog Timer");
-    P1.configWD(WATCHDOG_TIMEOUT, HOLD);
+    P1.configWD(WATCHDOG_TIMEOUT, TOGGLE);
     P1.startWD();
   } else {
     wdgLog.warning("Watchdog:: Not Enabling Watchdog Timer");

@@ -8,10 +8,11 @@
 #include "Global_Includes.h"
 
 static Logging ntpLog;
+static EthernetUDP Udp;
 
-static const char TimeServer[] =            "time.nist.gov";
-static const int NTP_PACKET_SIZE =           48;
-static const unsigned int                   NTPPort = 8888;
+static const char         TimeServer[]    = "time.nist.gov";
+static const int          NTP_PACKET_SIZE = 48;
+static const unsigned int NTPPort         = 8888;
 
 static byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
 
@@ -56,7 +57,6 @@ void cyclicNTP(void) {
       ntpLog.notice("NTP:: Seconds since Jan 1 1900 = %d ::", secsSince1900);
       unsigned long epoch = secsSince1900 - seventyYears + TimeZone * 3600;
       ntpLog.notice("Unix time = " );
-      //      RTC.set(epoch); //TODO: get system clock epoch set function
       setTime(epoch);
       PrintTime();
       Scheduler::currentScheduler().currentTask().disable();

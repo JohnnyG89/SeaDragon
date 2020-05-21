@@ -8,16 +8,14 @@
 #include "Global_Includes.h"
 
 static Logging                    almLog;
-
-DefineCalendarType(Calendar, CALENDAR_MAX_NUM_EVENTS);
+DefineCalendarType(Calendar,      CALENDAR_MAX_NUM_EVENTS);
 static Calendar                   MyCalendar;
 static Chronos::Event::Occurrence occurrenceList[OCCURRENCES_LIST_SIZE];
 static const int                  INTERVAL_PRINT_TODAY = 200;
-static const int                  INTERVAL_PRINT_WEEK = 2000;
 
 void initAlarms(void) {
   if (!gTimeSet) {
-    Log.warning("Alarms::Time not set. Trying again later.");
+    almLog.warning("Alarms::Time not set. Trying again later.");
     return;
   }
   almLog.begin(LOG_LEVEL_NOTICE, &Serial);
@@ -39,28 +37,11 @@ void initAlarms(void) {
   almLog.trace("Alarms:: Initialized Alarms");
 }
 
-char* FormatDateTimeString(Chronos::DateTime *pDT) {
-  char buff[100];
-  CStringBuilder sb(buff, sizeof(buff));
-  pDT->printTo(sb);
-  return buff;
-}
-
-char* PrintFormatAlarmStatusString(Chronos::Event::Occurrence *pOccurence) {
-  char FormatString[400] = ":: Alarm id %s :: Starts %s :: Ends %s :: Total Time %s ::";
-
-  Chronos::Span::Absolute DiffTime(pOccurence->finish - pOccurence->start);
-  Chronos::DateTime DiffTS(DiffTime.totalSeconds());
-
-  sprintf(FormatString, String(pOccurence->id).c_str(), FormatDateTimeString(&pOccurence->start), FormatDateTimeString(&pOccurence->finish), FormatDateTimeString(&DiffTS));
-  return FormatString;
-}
-
 void cyclicAlarms(void) {
   logTaskTimer("Alarms", &Scheduler::currentScheduler().currentTask());
 
   if (!gTimeSet) {
-    almLog.error("Alarms::Time was unset.  Returning to Initialization Routine");
+    almLog.error("Alarms:: Time was unset.  Returning to Initialization Routine ::");
     Scheduler::currentScheduler().currentTask().setCallback(&initAlarms);
     return;
   }
@@ -69,15 +50,15 @@ void cyclicAlarms(void) {
 
   if ((Scheduler::currentScheduler().currentTask().getRunCounter() % INTERVAL_PRINT_TODAY) == 0) {
     almLog.notice("Alarms:: Currently there are %d Alarms ongoing ::", numOngoing);
-
   }
+
   memset(gAlarmActiveArray, 0, CALENDAR_MAX_NUM_EVENTS * sizeof(bool));
   for (int ii = 0; ii < numOngoing; ii++) {
     gAlarmActiveArray[occurrenceList[ii].id] = true;
     if ((Scheduler::currentScheduler().currentTask().getRunCounter() % INTERVAL_PRINT_TODAY) == 0) {
-      char buff_starttime[150];
-      char buff_endtime[150];
-      char buff_totaltime[150];
+      char buff_starttime[50];
+      char buff_endtime[50];
+      char buff_totaltime[50];
       CStringBuilder sb_starttime(buff_starttime, sizeof(buff_starttime));
       CStringBuilder sb_endtime(buff_endtime, sizeof(buff_endtime));
       CStringBuilder sb_totaltime(buff_totaltime, sizeof(buff_totaltime));
@@ -86,45 +67,13 @@ void cyclicAlarms(void) {
       (occurrenceList[ii].finish - occurrenceList[ii].start).printTo(sb_totaltime);
 
       almLog.notice("Alarms:: Ongoing Alarm, id=%d - Name=%s :: Started %s :: Finishes %s :: Total Time %s ::", occurrenceList[ii].id, EventNames[occurrenceList[ii].id], buff_starttime, buff_endtime, buff_totaltime);
-      //      static int numUpcoming = MyCalendar.listNext(OCCURRENCES_LIST_SIZE, occurrenceList, Chronos::DateTime::now());
-      //      almLog.verbose("Alarms:: Currently there are %d Alarms Upcoming ::", numUpcoming);
-      //      for (int jj = 0; jj < numUpcoming; jj++) {
-      //        char abuff_starttime[150];
-      //        char abuff_endtime[150];
-      //        char abuff_totaltime[150];
-      //        CStringBuilder asb_starttime(abuff_starttime, sizeof(abuff_starttime));
-      //        CStringBuilder asb_endtime(abuff_endtime, sizeof(abuff_endtime));
-      //        CStringBuilder asb_totaltime(abuff_totaltime, sizeof(abuff_totaltime));
-      //        occurrenceList[jj].start.printTo(asb_starttime);
-      //        occurrenceList[jj].finish.printTo(asb_endtime);
-      //        (occurrenceList[jj].finish - occurrenceList[jj].start).printTo(asb_totaltime);
-      //      }
     }
   }
-
-  //  if ((Scheduler::currentScheduler().currentTask().getRunCounter() % INTERVAL_PRINT_WEEK) == 0) {
-  //    for (int day = 1; day <= 7; day++) {
-  //      Chronos::DateTime nextDay = Chronos::DateTime::now().next(Chronos::Mark::Weekly(day));
-  //      int NumEventsThatDay = MyCalendar.listForDay(OCCURRENCES_LIST_SIZE, occurrenceList, nextDay);
-  //      for (int kk = 0; kk < NumEventsThatDay; kk++) {
-  //        char buff_starttime[150];
-  //        char buff_endtime[150];
-  //        char buff_totaltime[150];
-  //        CStringBuilder sb_starttime(buff_starttime, sizeof(buff_starttime));
-  //        CStringBuilder sb_endtime(buff_endtime, sizeof(buff_endtime));
-  //        CStringBuilder sb_totaltime(buff_totaltime, sizeof(buff_totaltime));
-  //        occurrenceList[kk].start.printTo(sb_starttime);
-  //        occurrenceList[kk].finish.printTo(sb_endtime);
-  //        (occurrenceList[kk].finish - occurrenceList[kk].start).printTo(sb_totaltime);
-  //        almLog.verbose("Alarms:: Upcoming alarm, Day %d :: id=%d - Name=%s :: Started %s :: Finishes %s :: Total Time %s ::", day, occurrenceList[kk].id, EventNames[occurrenceList[kk].id], buff_starttime, buff_endtime, buff_totaltime);
-  //      }
-  //    }
-  //  }
 }
 
 static void initCalendar() {
   //  Serial.println(Chronos::DateTime::now().second());
-  char buff[150];
+  char buff[50];
   CStringBuilder sb(buff, sizeof(buff));
   bool ret;
 
@@ -153,7 +102,6 @@ static void initCalendar() {
   sb.reset();
 
   //Autofeeders;
-
 
   //Initialize Autofeeder 1 Instance 1
   NowTime.next(Autofeeder_1_1_OnTime).printTo(sb);
@@ -255,4 +203,15 @@ static void initCalendar() {
   almLog.notice("Alarms:: Added Event - %s :: Turns On %s :: Duration %d Seconds :: Result %B ::", EventNames[ALMID_DOSEPUMP_2_4], buff, DosePump_Pulse_Time.seconds(), ret);
   sb.reset();
 
+  //Initialize Powerhead Alarm
+  NowTime.next(Powerhead_OnTime).printTo(sb);
+  ret = MyCalendar.add(Powerhead_CalendarEvent);
+  almLog.notice("Alarms:: Added Event - %s :: Turns On %s :: Duration %d Minutes :: Result %B ::", EventNames[ALMID_POWERHEAD], buff, Chronos::Span::Minutes(55).minutes(), ret);
+  sb.reset();
+
+  //Initialize Wavemaker Alarm
+  NowTime.next(Wavemaker_OnTime).printTo(sb);
+  ret = MyCalendar.add(Wavemaker_CalendarEvent);
+  almLog.notice("Alarms:: Added Event - %s :: Turns On %s :: Duration %d Minutes :: Result %B ::", EventNames[ALMID_WAVEMAKER], buff, Chronos::Span::Minutes(50).minutes(), ret);
+  sb.reset();
 }
